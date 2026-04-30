@@ -247,8 +247,8 @@ function targetYakuAdjustment(tile, hand, targetYaku, seatWind, roundWind) {
   const mainSuit = Object.entries(suitCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
   const hasNeighbor = (d) => suit !== "z" && n + d >= 1 && n + d <= 9 && counts[tileIndex(`${n + d}${suit}`)] > 0;
   if (name.includes("タンヤオ")) { if (isHonor || isTerminal) { adjust += 45; reasons.push("タンヤオでは不要になりやすい"); } if (isSimple) adjust -= 18; }
-  if (name.includes("平和") || name.includes("リーチ") || name.includes("ツモ")) { if (isHonor && counts[idx] === 1) { adjust += 40; reasons.push("1枚字牌は順子手で使いにくい"); } if (isTerminal && !hasNeighbor(1) && !hasNeighbor(2) && !hasNeighbor(-1) && !hasNeighbor(-2)) { adjust += 18; reasons.push("孤立端牌は順子手で弱い"); } if (suit !== "z" && (hasNeighbor(1) || hasNeighbor(-1) || hasNeighbor(2) || hasNeighbor(-2))) adjust -= 12; }
-  if (name.includes("役牌")) { if (isValueHonor) adjust -= 35; if (isHonor && !isValueHonor && counts[idx] === 1) { adjust += 28; reasons.push("役牌以外の1枚字牌"); } }
+  if (name.includes("平和") || name.includes("リーチ") || name.includes("ツモ")) { if (isHonor && counts[idx] === 1) { adjust += 65; reasons.push("1枚字牌は順子手でかなり使いにくい"); } if (isTerminal && !hasNeighbor(1) && !hasNeighbor(2) && !hasNeighbor(-1) && !hasNeighbor(-2)) { adjust += 18; reasons.push("孤立端牌は順子手で弱い"); } if (suit !== "z" && (hasNeighbor(1) || hasNeighbor(-1) || hasNeighbor(2) || hasNeighbor(-2))) adjust -= 12; }
+  if (name.includes("役牌")) { if (isValueHonor) adjust -= 35; if (isHonor && !isValueHonor && counts[idx] === 1) { adjust += 55; reasons.push("役牌以外の1枚字牌は整理優先"); } }
   if (name.includes("七対子")) { if (counts[idx] >= 2) adjust -= 35; if (counts[idx] === 1) { adjust += 12; reasons.push("七対子では孤立牌を整理"); } }
   if (name.includes("対々和") || name.includes("三暗刻") || name.includes("四暗刻")) { if (counts[idx] >= 2) adjust -= 35; if (counts[idx] === 1 && suit !== "z") { adjust += 12; reasons.push("刻子手では孤立数牌を整理"); } }
   if (name.includes("混一色") || name.includes("清一色") || name.includes("一気通貫") || name.includes("九蓮宝燈")) { if (suit !== "z" && suit !== mainSuit) { adjust += 38; reasons.push(`${SUITS[mainSuit]?.label || "多い色"}以外を整理`); } if (name.includes("清一色") && isHonor) { adjust += 35; reasons.push("清一色では字牌を使わない"); } if (name.includes("混一色") && (suit === mainSuit || isHonor)) adjust -= 18; if (name.includes("清一色") && suit === mainSuit) adjust -= 24; }
@@ -270,7 +270,7 @@ function tileUsefulness(tile, counts, seatWind, roundWind) {
   if (suit === "z") {
     const isValue = tile === seatWind || tile === roundWind || ["5z", "6z", "7z"].includes(tile);
     if (isValue) { useful += 25; reasons.push("役牌候補"); }
-    else if (counts[idx] === 1) { useful -= 42; reasons.push("1枚だけの字牌で使いにくい"); }
+    else if (counts[idx] === 1) { useful -= 75; reasons.push("1枚だけの字牌なので優先して整理"); }
     return { useful, reasons };
   }
   const neighbors = [];
@@ -298,6 +298,9 @@ function discardPriorities(hand, mode, seatWind, roundWind, targetYaku = "最速
     const { useful, reasons } = tileUsefulness(tile, counts, seatWind, roundWind);
     const target = targetYakuAdjustment(tile, hand, targetYaku, seatWind, roundWind);
     let score = 100 - nextMin * 26 - useful + target.adjust;
+    if (tile[1] === "z" && counts[tileIndex(tile)] === 1 && !targetYaku.includes("国士") && !targetYaku.includes("字一色") && !targetYaku.includes("小四喜") && !targetYaku.includes("大四喜") && !targetYaku.includes("小三元") && !targetYaku.includes("大三元")) {
+      score += 45;
+    }
     if (delta > 0) score -= targetYaku === "最速テンパイ" ? 38 : 18;
     if (delta < 0) score += 25;
     const explain = [];
