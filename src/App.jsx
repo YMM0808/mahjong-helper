@@ -472,7 +472,7 @@ function App() {
 
   return (
     <div className="app"><style>{styles}</style><div className="container">
-      <div className="header"><div><h1>麻雀学習ヘルパー</h1><p>画像の牌をクリックして、シャンテン・近い役・目標役別の捨て候補を確認できます。</p></div><div className="mode-switch"><button className={mode === "4p" ? "mode-btn active" : "mode-btn"} onClick={() => changeMode("4p")}>4人麻雀</button><button className={mode === "3p" ? "mode-btn active" : "mode-btn"} onClick={() => changeMode("3p")}>3人麻雀</button></div></div>
+      <div className="header"><div><h1>麻雀初心者スキルアップツール</h1><p>画像の牌をクリックして、シャンテン・近い役・目標役別の捨て候補を確認できます。</p></div><div className="mode-switch"><button className={mode === "4p" ? "mode-btn active" : "mode-btn"} onClick={() => changeMode("4p")}>4人麻雀</button><button className={mode === "3p" ? "mode-btn active" : "mode-btn"} onClick={() => changeMode("3p")}>3人麻雀</button></div></div>
       <div className="grid-main">
         <div className="card">
           <div className="card-header"><div className="title-with-shanten"><h2>自分の手牌</h2>{shanten && <span className="shanten-badge">{shanten.min <= -1 ? "アガリ" : shanten.min === 0 ? "テンパイ" : `${shanten.min}シャンテン`}</span>}</div><div className="inline-buttons"><span className="badge">手牌 {hand.length}枚 / 鳴き {melds.length}組</span><button className="small-btn" onClick={removeLast}>1枚戻す</button><button className="small-btn" onClick={removeSelected}>選択牌を削除</button><button className="small-btn danger" onClick={clearAll}>全消去</button></div></div>
@@ -510,7 +510,7 @@ function App() {
         <section>
           <h2>このアプリについて</h2>
           <p>
-            麻雀学習ヘルパーは、麻雀初心者向けの学習ツールです。牌を選択すると、シャンテン数、近い役、目標役に合わせた捨て候補を確認できます。3人麻雀・4人麻雀の練習や牌姿検討に使えます。
+            麻雀初心者スキルアップツールは、麻雀初心者向けの学習ツールです。牌を選択すると、シャンテン数、近い役、目標役に合わせた捨て候補を確認できます。3人麻雀・4人麻雀の練習や牌姿検討に使えます。
           </p>
         </section>
 
@@ -548,7 +548,7 @@ function App() {
         <section>
           <h2>お問い合わせ</h2>
           <p>
-            不具合報告、改善要望、削除依頼などのお問い合わせ先は現在準備中です。公開用のメールアドレスまたはSNSアカウントを設定後、こちらに掲載します。
+            不具合報告、改善要望、削除依頼などは、X（旧Twitter）アカウント @ymm8125 までご連絡ください。
           </p>
         </section>
       </footer>
