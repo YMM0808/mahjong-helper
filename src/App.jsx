@@ -609,12 +609,12 @@ const YAKU_GUIDE = {
     { name: "地和", han: "役満", open: "子限定", desc: "子が鳴きのない第1ツモでアガる役満です。", point: "作る役ではなく、最初のツモで決まる超特殊役です。", exampleGroups: [["2m","3m","4m"],["3p","4p","5p"],["4s","5s","6s"],["7s","8s","9s"],["5p","5p"]] },
   ],
   "ドラ・特殊": [
-    { name: "ドラ", han: "打点アップ", open: "役ではない", desc: "ドラ表示牌から決まるボーナス牌です。ドラだけではアガれません。", point: "役を作ったうえでドラがあると点数が高くなります。", exampleGroups: [["5m"],["5p"],["5s"]] },
-    { name: "赤ドラ", han: "打点アップ", open: "役ではない", desc: "赤5を採用するルールで、赤5を持っていると打点が上がります。", point: "赤ドラだけではアガれないので、別の役が必要です。", exampleGroups: [["5m"],["5p"],["5s"]] },
-    { name: "抜きドラ（北）", han: "3人麻雀用", open: "役ではない", desc: "3人麻雀で北を抜くとドラ扱いになるルールがあります。", point: "北抜きだけではアガれないので、別の役が必要です。", exampleGroups: [["4z"]] },
-    { name: "流し満貫", han: "満貫扱い", open: "ルール依存", desc: "流局時、自分の捨て牌がすべて1・9・字牌で、誰にも鳴かれていない時に成立する特殊役です。", point: "採用されないルールもあります。", exampleGroups: [["1m"],["9m"],["1p"],["9p"],["1z"],["5z"],["7z"]] },
-    { name: "人和", han: "役満/満貫など", open: "ルール依存", desc: "子が自分の第1ツモ前にロンアガリする特殊役です。扱いはルールによって変わります。", point: "採用されない場合もあるローカル寄りの役です。", exampleGroups: [["2m","3m","4m"],["3p","4p","5p"],["4s","5s","6s"],["7s","8s","9s"],["5p","5p"]] },
-    { name: "数え役満", han: "13翻以上", open: "ルール依存", desc: "翻数の合計が13翻以上になった時、役満扱いにするルールです。", point: "役そのものというより、点数計算上の扱いです。", exampleGroups: [["1p","2p","3p"],["3p","4p","5p"],["5p","6p","7p"],["7p","8p","9p"],["9p","9p"]] },
+    { name: "ドラ", han: "打点アップ", open: "役ではない", desc: "ドラ表示牌から決まるボーナス牌です。ドラを持っていると点数が上がります。ただし、ドラだけではアガれません。", point: "まずはリーチ・タンヤオ・役牌などの役を作り、そのうえでドラがあると点数が高くなる、と覚えると分かりやすいです。" },
+    { name: "赤ドラ", han: "打点アップ", open: "役ではない", desc: "赤い5の牌を採用するルールで、赤5を持っていると点数が上がります。ただし、赤ドラだけではアガれません。", point: "赤5は強い牌ですが、役ではありません。別にアガれる役を作る必要があります。" },
+    { name: "抜きドラ（北）", han: "3人麻雀用", open: "役ではない", desc: "3人麻雀で北を抜くと、ドラのように点数が上がるルールがあります。ただし、北抜きだけではアガれません。", point: "北を抜くと手牌から外れて点数アップ要素になります。アガるには、リーチ・タンヤオ・役牌など別の役が必要です。" },
+    { name: "流し満貫", han: "満貫扱い", open: "ルール依存", desc: "流局した時、自分の捨て牌がすべて1・9・字牌で、さらに自分の捨て牌を誰にも鳴かれていない場合に成立する特殊役です。", point: "普通に手牌を完成させる役ではありません。採用されないルールもあります。" },
+    { name: "人和", han: "役満/満貫など", open: "ルール依存", desc: "子が自分の最初のツモ番が来る前に、他家の捨て牌でロンアガリする特殊役です。", point: "扱いはルールによって変わります。採用されない場合もあるため、ルール確認が必要です。" },
+    { name: "数え役満", han: "13翻以上", open: "ルール依存", desc: "役やドラなどを合計して13翻以上になった時、役満として扱うルールです。", point: "特定の形を作る役ではなく、点数計算上の扱いです。ルールによって採用や扱いが変わります。" },
   ],
 };
 
@@ -626,11 +626,11 @@ function YakuGuideModal({ open, onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="yaku-modal" onClick={(e) => e.stopPropagation()}>
         <div className="yaku-modal-header">
-          <div><h2>役一覧（初心者向け）</h2><div className="yaku-modal-sub">牌画像つきで、役の作り方の例を確認できます。</div></div>
+          <div><h2>役一覧（初心者向け）</h2><div className="yaku-modal-sub">通常役は牌画像つき、ドラ・特殊役は条件を文字で確認できます。</div></div>
           <button className="small-btn danger" onClick={onClose}>閉じる</button>
         </div>
         <div className="yaku-tabs">{Object.keys(YAKU_GUIDE).map((key) => <button key={key} className={tab === key ? "mode-btn active" : "mode-btn"} onClick={() => setTab(key)}>{key}</button>)}</div>
-        <div className="yaku-guide-list">{items.map((item) => <div className="yaku-guide-card" key={item.name}><div className="yaku-guide-name">{item.name}</div><div className="yaku-guide-meta"><span className="badge">{item.han}</span><span className="badge">{item.open}</span></div><div className="yaku-guide-desc">{item.desc}</div><div className="yaku-guide-example-title">作り方の例</div><div className="yaku-guide-example">{item.exampleGroups.map((group, gi) => <div className="yaku-group" key={`${item.name}-${gi}`}>{group.map((tile, ti) => <Tile key={`${tile}-${ti}`} tile={tile} small />)}</div>)}</div><div className="yaku-guide-point"><b>ポイント：</b>{item.point}</div></div>)}</div>
+        <div className="yaku-guide-list">{items.map((item) => <div className="yaku-guide-card" key={item.name}><div className="yaku-guide-name">{item.name}</div><div className="yaku-guide-meta"><span className="badge">{item.han}</span><span className="badge">{item.open}</span></div><div className="yaku-guide-desc">{item.desc}</div>{item.exampleGroups && <><div className="yaku-guide-example-title">作り方の例</div><div className="yaku-guide-example">{item.exampleGroups.map((group, gi) => <div className="yaku-group" key={`${item.name}-${gi}`}>{group.map((tile, ti) => <Tile key={`${tile}-${ti}`} tile={tile} small />)}</div>)}</div></>}<div className="yaku-guide-point"><b>ポイント：</b>{item.point}</div></div>)}</div>
       </div>
     </div>
   );
