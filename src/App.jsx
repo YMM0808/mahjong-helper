@@ -364,6 +364,7 @@ function App() {
   const [selectedHandIndex, setSelectedHandIndex] = useState(null);
   const [meldMode, setMeldMode] = useState(null);
   const [melds, setMelds] = useState([]);
+  const [showYakuGuide, setShowYakuGuide] = useState(false);
   const meldTileArray = useMemo(() => allMeldTiles(melds), [melds]);
   const visibleCounts = useMemo(() => tileCounts([...hand, ...meldTileArray]), [hand, meldTileArray]);
   const shanten = useMemo(() => calcShanten(hand, melds), [hand, melds]);
@@ -475,7 +476,7 @@ function App() {
 
   return (
     <div className="app"><style>{styles}</style><div className="container">
-      <div className="header"><div><h1>麻雀初心者スキルアップツール</h1><p>画像の牌をクリックして、シャンテン・近い役・目標役別の捨て候補を確認できます。</p></div><div className="mode-switch"><button className={mode === "4p" ? "mode-btn active" : "mode-btn"} onClick={() => changeMode("4p")}>4人麻雀</button><button className={mode === "3p" ? "mode-btn active" : "mode-btn"} onClick={() => changeMode("3p")}>3人麻雀</button></div></div>
+      <div className="header"><div><h1>麻雀初心者スキルアップツール</h1><p>画像の牌をクリックして、シャンテン・近い役・目標役別の捨て候補を確認できます。</p></div><div className="mode-switch"><button className="mode-btn" onClick={() => setShowYakuGuide(true)}>役一覧を見る</button><button className={mode === "4p" ? "mode-btn active" : "mode-btn"} onClick={() => changeMode("4p")}>4人麻雀</button><button className={mode === "3p" ? "mode-btn active" : "mode-btn"} onClick={() => changeMode("3p")}>3人麻雀</button></div></div>
       <div className="grid-main">
         <div className="card">
           <div className="card-header"><div className="title-with-shanten"><h2>自分の手牌</h2>{shanten && <span className="shanten-badge">{shanten.min <= -1 ? "アガリ" : shanten.min === 0 ? "テンパイ" : `${shanten.min}シャンテン`}</span>}</div><div className="inline-buttons"><span className="badge">手牌 {hand.length}枚 / 鳴き {melds.length}組</span><button className="small-btn" onClick={removeLast}>1枚戻す</button><button className="small-btn" onClick={removeSelected}>選択牌を削除</button><button className="small-btn danger" onClick={clearAll}>全消去</button></div></div>
@@ -555,12 +556,61 @@ function App() {
           </p>
         </section>
       </footer>
+    <YakuGuideModal open={showYakuGuide} onClose={() => setShowYakuGuide(false)} />
     </div></div>
+  );
+}
+
+const YAKU_GUIDE = {
+  "1翻": [
+    { name: "リーチ", han: "1翻", open: "門前限定", desc: "門前でテンパイしたら宣言できる基本役です。", point: "初心者はまずリーチを覚えると分かりやすいです。", exampleGroups: [["2m","3m","4m"],["3p","4p","5p"],["4s","5s","6s"],["7s","8s","9s"],["5p","5p"]] },
+    { name: "タンヤオ", han: "1翻", open: "鳴きOK", desc: "1・9・字牌を使わず、2〜8の数牌だけで作ります。", point: "狙いやすい基本役です。1枚だけの字牌や端牌を整理すると近づきます。", exampleGroups: [["2m","3m","4m"],["3p","4p","5p"],["4s","5s","6s"],["6s","7s","8s"],["5p","5p"]] },
+    { name: "役牌", han: "1翻", open: "鳴きOK", desc: "白・發・中、自風、場風を3枚そろえる役です。", point: "2枚ある役牌はポンできると一気にアガリやすくなります。", exampleGroups: [["5m","6m","7m"],["2p","3p","4p"],["3s","4s","5s"],["5p","5p"],["5z","5z","5z"]] },
+    { name: "平和", han: "1翻", open: "門前限定", desc: "順子4つ＋役牌ではない雀頭で作る役です。", point: "リーチと相性が良い基本役です。字牌を少なくして順子を作ります。", exampleGroups: [["2m","3m","4m"],["3p","4p","5p"],["4s","5s","6s"],["6m","7m","8m"],["2p","2p"]] },
+  ],
+  "2翻": [
+    { name: "七対子", han: "2翻", open: "門前限定", desc: "同じ牌のペアを7組作る特殊な役です。", point: "対子が多い時に狙えます。鳴くと作れません。", exampleGroups: [["1m","1m"],["3m","3m"],["5p","5p"],["7p","7p"],["2s","2s"],["6s","6s"],["5z","5z"]] },
+    { name: "対々和", han: "2翻", open: "鳴きOK", desc: "順子を使わず、刻子を4つ作る役です。", point: "ポンが多い時に狙いやすいです。チーとは相性が悪いです。", exampleGroups: [["2m","2m","2m"],["5p","5p","5p"],["7s","7s","7s"],["6z","6z","6z"],["4p","4p"]] },
+    { name: "三色同順", han: "2翻", open: "鳴きOK", desc: "萬子・筒子・索子で同じ数字の順子を作る役です。", point: "123、456、789など同じ並びを3色でそろえます。", exampleGroups: [["2m","3m","4m"],["2p","3p","4p"],["2s","3s","4s"],["6p","7p","8p"],["5z","5z"]] },
+    { name: "一気通貫", han: "2翻", open: "鳴きOK", desc: "同じ種類で123・456・789をそろえる役です。", point: "1色で縦に長くつながっている時に狙えます。", exampleGroups: [["1m","2m","3m"],["4m","5m","6m"],["7m","8m","9m"],["3p","4p","5p"],["7s","7s"]] },
+  ],
+  "3翻以上": [
+    { name: "混一色", han: "3翻（鳴き2翻）", open: "鳴きOK", desc: "1種類の数牌＋字牌だけで作る役です。", point: "字牌も使えるので、初心者でも形にしやすい高打点役です。", exampleGroups: [["2m","3m","4m"],["5m","6m","7m"],["8m","8m","8m"],["5z","5z","5z"],["6z","6z"]] },
+    { name: "清一色", han: "6翻（鳴き5翻）", open: "鳴きOK", desc: "1種類の数牌だけで作る役です。", point: "打点は高いですが、字牌も他の色も使えないので少し難しいです。", exampleGroups: [["1p","2p","3p"],["3p","4p","5p"],["5p","6p","7p"],["7p","8p","9p"],["9p","9p"]] },
+    { name: "小三元", han: "2翻", open: "鳴きOK", desc: "白・發・中のうち2つを刻子、残り1つを雀頭にする役です。", point: "役牌とセットで高くなりやすいです。", exampleGroups: [["5z","5z","5z"],["6z","6z","6z"],["7z","7z"],["2m","3m","4m"],["6p","7p","8p"]] },
+    { name: "チャンタ", han: "2翻（鳴き1翻）", open: "鳴きOK", desc: "すべての面子と雀頭に1・9・字牌を絡める役です。", point: "端牌や字牌が多い時に候補になります。", exampleGroups: [["1m","2m","3m"],["7p","8p","9p"],["1s","1s","1s"],["5z","5z","5z"],["9m","9m"]] },
+    { name: "純チャン", han: "3翻（鳴き2翻）", open: "鳴きOK", desc: "すべての面子と雀頭に1・9牌を絡め、字牌を使わない役です。", point: "チャンタより難しいですが、字牌を使わない分高くなります。", exampleGroups: [["1m","2m","3m"],["7p","8p","9p"],["1s","1s","1s"],["7m","8m","9m"],["9s","9s"]] },
+  ],
+  "役満": [
+    { name: "国士無双", han: "役満", open: "門前限定", desc: "1・9牌と字牌を1枚ずつ集め、そのうち1種類をもう1枚そろえる役です。", point: "かなり特殊な形です。最初から么九牌が多い時だけ狙います。", exampleGroups: [["1m"],["9m"],["1p"],["9p"],["1s"],["9s"],["1z"],["2z"],["3z"],["4z"],["5z"],["6z"],["7z"],["1m","1m"]] },
+    { name: "四暗刻", han: "役満", open: "門前限定", desc: "暗刻を4つ作る役です。", point: "ポンせずに同じ牌が3枚ずつ集まった時の夢役です。", exampleGroups: [["2m","2m","2m"],["5p","5p","5p"],["7s","7s","7s"],["6z","6z","6z"],["4p","4p"]] },
+    { name: "大三元", han: "役満", open: "鳴きOK", desc: "白・發・中をすべて刻子にする役です。", point: "白發中が2枚以上ある時は意識しやすい役満です。", exampleGroups: [["5z","5z","5z"],["6z","6z","6z"],["7z","7z","7z"],["2m","3m","4m"],["8p","8p"]] },
+    { name: "字一色", han: "役満", open: "鳴きOK", desc: "字牌だけで手を作る役です。", point: "字牌の対子や刻子が多い時にだけ見ます。", exampleGroups: [["1z","1z","1z"],["2z","2z","2z"],["5z","5z","5z"],["6z","6z","6z"],["7z","7z"]] },
+    { name: "九蓮宝燈", han: "役満", open: "門前限定", desc: "1色で1112345678999＋同じ色のどれか1枚を加えた役です。", point: "かなり特別な役です。同じ色に大きく寄った時だけ候補になります。", exampleGroups: [["1p","1p","1p"],["2p"],["3p"],["4p"],["5p"],["6p"],["7p"],["8p"],["9p","9p","9p"],["5p"]] },
+  ],
+};
+
+function YakuGuideModal({ open, onClose }) {
+  const [tab, setTab] = useState("1翻");
+  if (!open) return null;
+  const items = YAKU_GUIDE[tab] || [];
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="yaku-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="yaku-modal-header">
+          <div><h2>役一覧（初心者向け）</h2><div className="yaku-modal-sub">牌画像つきで、役の作り方の例を確認できます。</div></div>
+          <button className="small-btn danger" onClick={onClose}>閉じる</button>
+        </div>
+        <div className="yaku-tabs">{Object.keys(YAKU_GUIDE).map((key) => <button key={key} className={tab === key ? "mode-btn active" : "mode-btn"} onClick={() => setTab(key)}>{key}</button>)}</div>
+        <div className="yaku-guide-list">{items.map((item) => <div className="yaku-guide-card" key={item.name}><div className="yaku-guide-name">{item.name}</div><div className="yaku-guide-meta"><span className="badge">{item.han}</span><span className="badge">{item.open}</span></div><div className="yaku-guide-desc">{item.desc}</div><div className="yaku-guide-example-title">作り方の例</div><div className="yaku-guide-example">{item.exampleGroups.map((group, gi) => <div className="yaku-group" key={`${item.name}-${gi}`}>{group.map((tile, ti) => <Tile key={`${tile}-${ti}`} tile={tile} small />)}</div>)}</div><div className="yaku-guide-point"><b>ポイント：</b>{item.point}</div></div>)}</div>
+      </div>
+    </div>
   );
 }
 
 const styles = `
 *{box-sizing:border-box}body{margin:0;background:#f3f6fb;font-family:Arial,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:#1f2937}button{font:inherit}.app{min-height:100vh;padding:16px}.container{max-width:1380px;margin:0 auto}.header{display:flex;gap:12px;justify-content:space-between;align-items:flex-end;margin-bottom:16px;flex-wrap:wrap}.header h1{margin:0 0 6px 0;font-size:32px}.header p{margin:0;color:#6b7280}.mode-switch,.inline-buttons{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.mode-btn,.small-btn{border:1px solid #cbd5e1;background:white;border-radius:10px;padding:10px 14px;cursor:pointer}.mode-btn.active,.small-btn.active{background:#2563eb;color:white;border-color:#2563eb}.small-btn{padding:6px 9px;font-size:13px}.small-btn:disabled{opacity:.4;cursor:not-allowed}.small-btn.danger{background:#ef4444;color:white;border-color:#ef4444}.grid-main{display:grid;grid-template-columns:1.45fr .95fr;gap:16px;align-items:start}.side-column{display:flex;flex-direction:column;gap:16px}.card{background:white;border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:16px}.card h2{margin:0 0 14px 0;font-size:22px}.card-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}.hand-sticky-wrap{margin-bottom:14px}.sticky-hand-title{display:none}.tile-row{min-height:86px;border:1px solid #e5e7eb;background:#f8fafc;border-radius:14px;padding:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px}.tsumo-tile-wrap{margin-left:18px;position:relative;display:flex;flex-direction:column;align-items:center}.tsumo-label{font-size:10px;color:#2563eb;font-weight:800;margin-top:2px}.empty-text,.muted{color:#94a3b8}.selected-box{background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:8px 10px;margin-bottom:8px;font-size:13px}.selected-box span{color:#475569;margin-left:8px}.wind-wrap{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}.wind-box,.meld-box{background:#f8fafc;border:1px solid #e5e7eb;border-radius:12px;padding:8px}.meld-box{margin-bottom:10px}.wind-title,.section-title{font-weight:700;margin-bottom:6px}.wind-title{font-size:14px}.section-title{font-size:16px}.meld-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.meld-list{display:flex;flex-direction:column;gap:6px;margin-top:8px}.meld-view{display:flex;gap:6px;align-items:center;background:white;border:1px solid #e5e7eb;border-radius:12px;padding:6px}.meld-tiles{display:flex;gap:4px}.palette-wrap{display:flex;flex-direction:column;gap:12px}.palette-group{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}.palette-label{width:40px;font-weight:700;color:#64748b;padding-top:8px}.palette-tiles{display:flex;gap:6px;flex-wrap:wrap;flex:1}.tile-btn{border:1px solid #d1d5db;background:white;border-radius:10px;padding:4px;cursor:pointer;transition:transform .12s ease;display:flex;align-items:center;justify-content:center}.tile-btn:hover{transform:scale(1.05)}.tile-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}.tile-selected{box-shadow:0 0 0 3px #2563eb;background:#eff6ff}.tile-normal{width:50px;height:72px}.tile-small{width:40px;height:58px}.tile-img{width:100%;height:100%;object-fit:contain}.tile-fallback{width:100%;height:100%;border-radius:6px;background:#f8fafc;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px}.tile-fallback-main{font-size:14px;font-weight:700}.title-with-shanten{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.shanten-badge{background:#ecfdf5;border:1px solid #86efac;color:#047857;border-radius:999px;padding:7px 12px;font-size:14px;font-weight:800;white-space:nowrap}.list{display:flex;flex-direction:column;gap:10px}.list-item,.rank-item{border:1px solid #e5e7eb;border-radius:14px;padding:12px;background:white;display:flex;gap:10px;align-items:center;justify-content:space-between}.rank-item{justify-content:flex-start}.rank-num{width:28px;text-align:center;font-size:24px;font-weight:800;color:#2563eb}.rank-main{flex:1;min-width:0}.item-title{font-weight:700}.item-sub{font-size:12px;color:#64748b;margin-top:4px}.grade{display:inline-block;width:24px}.badge{background:#e2e8f0;color:#1f2937;border-radius:999px;padding:6px 10px;font-size:12px;white-space:nowrap}.badge.danger{background:#fee2e2;color:#b91c1c}.note{margin-top:12px;border-radius:14px;padding:12px;background:#f8fafc;color:#475569;font-size:13px}.note.compact{margin-top:6px;padding:8px;font-size:12px;line-height:1.5}.yaku-select{width:100%;text-align:left;cursor:pointer}.yaku-select.active{border-color:#2563eb;background:#eff6ff;box-shadow:inset 0 0 0 2px #2563eb}.target-yaku{margin:-4px 0 12px 0;background:#eff6ff;color:#1d4ed8;border-radius:12px;padding:10px 12px;font-size:14px}.helper-text{background:#f8fafc;border:1px solid #e5e7eb;color:#475569;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.5;margin:-4px 0 12px 0}@media(max-width:1100px){.grid-main{grid-template-columns:1fr}}.site-info{margin-top:24px;background:white;border-radius:18px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:20px;display:flex;flex-direction:column;gap:18px}.site-info section{border-top:1px solid #e5e7eb;padding-top:16px}.site-info section:first-child{border-top:none;padding-top:0}.site-info h2{font-size:20px;margin:0 0 8px 0}.site-info p,.site-info li{font-size:14px;line-height:1.8;color:#475569}.site-info ol{margin:0;padding-left:20px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}.yaku-modal{width:min(1100px,100%);max-height:90vh;overflow:auto;background:white;border-radius:18px;box-shadow:0 12px 40px rgba(0,0,0,.2);padding:18px}.yaku-modal-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}.yaku-modal-header h2{margin:0 0 4px 0}.yaku-modal-sub{color:#64748b;font-size:14px}.yaku-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.yaku-guide-list{display:flex;flex-direction:column;gap:14px}.yaku-guide-card{border:1px solid #e5e7eb;border-radius:16px;padding:14px;background:#f8fafc}.yaku-guide-name{font-size:20px;font-weight:800;margin-bottom:6px}.yaku-guide-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.yaku-guide-desc{color:#334155;line-height:1.7;margin-bottom:10px}.yaku-guide-example-title{font-weight:700;margin-bottom:8px}.yaku-guide-example{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}.yaku-group{display:flex;gap:4px;align-items:center;padding:8px 10px;background:white;border:1px solid #e5e7eb;border-radius:12px}.yaku-guide-point{font-size:14px;line-height:1.7;color:#1e293b;background:white;border-radius:12px;padding:10px 12px;border:1px solid #e5e7eb}
 @media(max-width:700px){.header h1{font-size:24px}.mini-grid,.wind-wrap{grid-template-columns:1fr}.tile-normal{width:42px;height:62px}.tile-small{width:34px;height:50px}.palette-label{width:100%;padding-top:0}.selected-box span{display:block;margin-left:0;margin-top:4px}.hand-sticky-wrap{position:sticky;top:0;z-index:30;background:white;padding:8px 0 4px 0;border-bottom:1px solid #e5e7eb}.sticky-hand-title{display:flex;align-items:center;gap:8px;margin:0 0 6px 2px;font-size:13px;color:#475569}.sticky-hand-title span{font-weight:800;color:#111827}.sticky-hand-title b{background:#ecfdf5;color:#047857;border:1px solid #86efac;border-radius:999px;padding:3px 8px;font-size:12px}.sticky-hand-title em{font-style:normal;background:#eff6ff;color:#1d4ed8;border-radius:999px;padding:3px 8px;font-size:12px}.hand-sticky-wrap .tile-row{margin-bottom:8px;max-height:132px;overflow:auto;box-shadow:0 6px 14px rgba(0,0,0,.08)}.card-header{position:sticky;top:0;z-index:31;background:white;padding-bottom:8px}.app{padding:10px}.card{padding:14px}.tile-row{gap:4px}.tsumo-tile-wrap{margin-left:12px}}
 `;
 
